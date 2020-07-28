@@ -1,20 +1,22 @@
 package com.sap.sgs.phosphor.fosstars.data.github;
 
+import static com.sap.sgs.phosphor.fosstars.maven.MavenUtils.browse;
 import static com.sap.sgs.phosphor.fosstars.maven.MavenUtils.readModel;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.USES_NOHTTP;
 
+import com.sap.sgs.phosphor.fosstars.maven.AbstractModelVisitor;
 import com.sap.sgs.phosphor.fosstars.model.Feature;
 import com.sap.sgs.phosphor.fosstars.model.Value;
 import com.sap.sgs.phosphor.fosstars.tool.github.GitHubProject;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Optional;
+import java.util.Set;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.kohsuke.github.GHContent;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHRepository;
 
 /**
  * This data provider checks if an open-source project uses
@@ -43,7 +45,7 @@ public class UsesNoHttpTool extends CachedSingleFeatureGitHubDataProvider {
   protected Value fetchValueFor(GitHubProject project) throws IOException {
     logger.info("Figuring out if the project uses nohttp ...");
 
-    GHRepository repository = fetcher.repositoryFor(project);
+    LocalRepository repository = fetcher.localRepositoryFor(project);
     return USES_NOHTTP.value(checkMaven(repository) || checkGradle(repository));
   }
 
@@ -53,29 +55,18 @@ public class UsesNoHttpTool extends CachedSingleFeatureGitHubDataProvider {
    * @param repository The project's repository.
    * @return True if the project uses the plugin, false otherwise.
    */
-  private boolean checkMaven(GHRepository repository) throws IOException {
-    GHContent content;
-    try {
-      content = repository.getFileContent("pom.xml");
-    } catch (GHFileNotFoundException e) {
+  private boolean checkMaven(LocalRepository repository) throws IOException {
+    Optional<InputStream> content = repository.read("pom.xml");
+
+    if (!content.isPresent()) {
       return false;
     }
 
-    if (content == null || !content.isFile()) {
-      return false;
+    try (InputStream is = content.get()) {
+      Model model = readModel(is);
+      return browse(model, withVisitor()).result;
+
     }
-
-    Model model = readModel(content.read());
-
-    if (model.getBuild() != null) {
-      for (Plugin plugin : model.getBuild().getPlugins()) {
-        if (isNoHttp(plugin)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -84,19 +75,14 @@ public class UsesNoHttpTool extends CachedSingleFeatureGitHubDataProvider {
    * @param repository The project's repository.
    * @return True if the project uses the plugin, false otherwise.
    */
-  private boolean checkGradle(GHRepository repository) throws IOException {
-    GHContent content;
-    try {
-      content = repository.getFileContent("build.gradle");
-    } catch (GHFileNotFoundException e) {
+  private boolean checkGradle(LocalRepository repository) throws IOException {
+    Optional<InputStream> content = repository.read("build.gradle");
+
+    if (!content.isPresent()) {
       return false;
     }
 
-    if (content == null || !content.isFile()) {
-      return false;
-    }
-
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(content.read()))) {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(content.get()))) {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.trim().startsWith("id \"io.spring.nohttp\"")) {
@@ -135,5 +121,30 @@ public class UsesNoHttpTool extends CachedSingleFeatureGitHubDataProvider {
     }
 
     return false;
+  }
+
+  /**
+   * Creates a new visitor for searching the nohttp tool.
+   */
+  private static Visitor withVisitor() {
+    return new Visitor();
+  }
+
+  /**
+   * A visitor for searching the nohttp tool.
+   */
+  private static class Visitor extends AbstractModelVisitor {
+
+    /**
+     * This flag shows whether the nohttp tool was found in a POM file or not.
+     */
+    private boolean result;
+
+    @Override
+    public void accept(Plugin plugin, Set<Location> locations) {
+      if (isNoHttp(plugin)) {
+        result = true;
+      }
+    }
   }
 }

@@ -11,7 +11,10 @@ import java.util.Objects;
  */
 public class DoubleValue extends AbstractValue<Double> {
 
-  private final double number;
+  /**
+   * A double value.
+   */
+  protected final double number;
 
   /**
    * Initializes a {@link DoubleValue} of a specified feature.

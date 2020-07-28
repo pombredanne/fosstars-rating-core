@@ -17,12 +17,11 @@ import java.io.InputStream;
 /**
  * <p>The score shows if an open-source project uses FindSecBugs to catch security issues.</p>
  *
- * <p>The score is based on the following features:
+ * <p>The score is based on the following features.</p>
  * <ul>
  *   <li>{@link com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures#LANGUAGES}</li>
  *   <li>{@link com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures#USES_FIND_SEC_BUGS}</li>
  * </ul>
- * </p>
  */
 public class FindSecBugsScore extends FeatureBasedScore {
 
@@ -66,8 +65,7 @@ public class FindSecBugsScore extends FeatureBasedScore {
     private static final String TEST_VECTORS_YAML = "FindSecBugsScoreTestVectors.yml";
 
     /**
-     * Initializes a {@link Verification}
-     * for a {@link FindSecBugsScore}.
+     * Initializes a {@link Verification} for a {@link FindSecBugsScore}.
      *
      * @param score A score to be verified.
      * @param vectors A list of test vectors.

@@ -22,6 +22,7 @@ import com.sap.sgs.phosphor.fosstars.model.score.oss.ProjectSecurityAwarenessSco
 import com.sap.sgs.phosphor.fosstars.model.score.oss.ProjectSecurityTestingScore;
 import com.sap.sgs.phosphor.fosstars.model.score.oss.StaticAnalysisScore;
 import com.sap.sgs.phosphor.fosstars.model.score.oss.UnpatchedVulnerabilitiesScore;
+import com.sap.sgs.phosphor.fosstars.model.score.oss.VulnerabilityDiscoveryAndSecurityTestingScore;
 import com.sap.sgs.phosphor.fosstars.model.score.oss.VulnerabilityLifetimeScore;
 import com.sap.sgs.phosphor.fosstars.model.value.ScoreValue;
 import java.util.Set;
@@ -56,7 +57,8 @@ import java.util.Set;
     @JsonSubTypes.Type(value = MemorySafetyTestingScore.class),
     @JsonSubTypes.Type(value = FindSecBugsScore.class),
     @JsonSubTypes.Type(value = FuzzingScore.class),
-    @JsonSubTypes.Type(value = StaticAnalysisScore.class)
+    @JsonSubTypes.Type(value = StaticAnalysisScore.class),
+    @JsonSubTypes.Type(value = VulnerabilityDiscoveryAndSecurityTestingScore.class)
 })
 public interface Score extends Feature<Double> {
 
@@ -76,17 +78,23 @@ public interface Score extends Feature<Double> {
   Interval INTERVAL = DoubleInterval.init().from(0).to(10).closed().make();
 
   /**
-   * Returns a name of the score.
+   * Get a name of the score.
+   *
+   * @return A name of the score.
    */
   String name();
 
   /**
-   * Returns a description of the score.
+   * Get a description of the score.
+   *
+   * @return A description of the score.
    */
   String description();
 
   /**
-   * Returns a set of features which the score uses directly.
+   * Get a set of features which the score directly uses.
+   *
+   * @return A set of features which the score uses directly.
    */
   Set<Feature> features();
 
@@ -98,7 +106,9 @@ public interface Score extends Feature<Double> {
   Set<Feature> allFeatures();
 
   /**
-   * Returns a set of sub-scores which the score uses directly.
+   * Get sub-scores which the score directly uses.
+   *
+   * @return A set of sub-scores which the score uses directly.
    */
   Set<Score> subScores();
 

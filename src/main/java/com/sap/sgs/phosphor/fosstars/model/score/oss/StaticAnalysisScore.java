@@ -2,6 +2,7 @@ package com.sap.sgs.phosphor.fosstars.model.score.oss;
 
 import static com.sap.sgs.phosphor.fosstars.model.other.Utils.setOf;
 
+import com.sap.sgs.phosphor.fosstars.model.Confidence;
 import com.sap.sgs.phosphor.fosstars.model.Feature;
 import com.sap.sgs.phosphor.fosstars.model.Score;
 import com.sap.sgs.phosphor.fosstars.model.Value;
@@ -16,14 +17,14 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The score shows how an open-source project uses static analysis for security testing.
- * It's based on the following sub-scores:
+ * <p>The score shows how an open-source project uses static analysis for security testing.</p>
+ * <p>It's based on the following sub-scores:</p>
  * <ul>
  *   <li>{@link LgtmScore}</li>
  *   <li>{@link FindSecBugsScore}</li>
  * </ul>
- * The above sub-scores may not apply to all projects. The score considers only the sub-scores
- * that is applicable to a particular project.
+ * <p>The above sub-scores may not apply to all projects. The score considers only the sub-scores
+ * that is applicable to a particular project.</p>
  */
 public class StaticAnalysisScore extends AbstractScore {
 
@@ -81,6 +82,7 @@ public class StaticAnalysisScore extends AbstractScore {
 
     scoreValue.increase(lgtmScoreValue.orElse(MIN));
     scoreValue.increase(findSecBugsScoreValue.orElse(MIN));
+    scoreValue.confidence(Confidence.make(lgtmScoreValue, findSecBugsScoreValue));
 
     return scoreValue;
   }

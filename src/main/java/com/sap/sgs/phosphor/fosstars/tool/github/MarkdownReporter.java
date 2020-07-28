@@ -49,16 +49,10 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
    */
   private static final String PROJECT_LINE_TEMPLATE
       = "| %NAME% | %STARS% | %SCORE% | %LABEL% | %CONFIDENCE% | %DATE% |";
-
-  /**
-   * If confidence is lower than this value, then it's considered low.
-   */
-  private static final double CONFIDENCE_THRESHOLD = 7.0;
-
   /**
    * A length of line in a project name.
    */
-  static final int NAME_LINE_LENGTH = 42;
+  private static final int NAME_LINE_LENGTH = 42;
 
   /**
    * A date formatter.
@@ -70,21 +64,6 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
    * This string is printed out if something is unknown.
    */
   static final String UNKNOWN = "Unknown";
-
-  /**
-   * This string is printed out if something is unclear, for example, rating.
-   */
-  static final String UNCLEAR = "Unclear";
-
-  /**
-   * This string is printed out if something is low, for example, confidence.
-   */
-  static final String LOW = "Low";
-
-  /**
-   * This string is printed out if something is high, for example, confidence.
-   */
-  static final String HIGH = "High";
 
   /**
    * An output directory.
@@ -175,8 +154,6 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
     logger.info("Storing a report to {}", path);
     Files.write(path, build(sb.toString(), statistics).getBytes());
   }
-
-
 
   /**
    * Prints out a name of a project.
@@ -291,12 +268,7 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
       return UNKNOWN;
     }
 
-    RatingValue ratingValue = something.get();
-    if (unclear(ratingValue)) {
-      return LOW;
-    }
-
-    return HIGH;
+    return String.format("%2.2f", something.get().confidence());
   }
 
   /**
@@ -308,19 +280,7 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
       return UNKNOWN;
     }
 
-    RatingValue ratingValue = something.get();
-    if (unclear(ratingValue)) {
-      return UNCLEAR;
-    }
-
-    return ratingValue.label().name();
-  }
-
-  /**
-   * Returns true if confidence of a rating value is low, false otherwise.
-   */
-  private static boolean unclear(RatingValue ratingValue) {
-    return ratingValue.scoreValue().confidence() < CONFIDENCE_THRESHOLD;
+    return something.get().label().name();
   }
 
   /**
@@ -333,10 +293,6 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
     }
 
     RatingValue ratingValue = something.get();
-    if (unclear(ratingValue)) {
-      return UNCLEAR;
-    }
-
     ScoreValue scoreValue = ratingValue.scoreValue();
     return PrettyPrinter.tellMeActualValueOf(scoreValue);
   }
@@ -439,11 +395,6 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
 
       RatingValue ratingValue = project.ratingValue().get();
 
-      if (unclear(ratingValue)) {
-        unclearRatings++;
-        return;
-      }
-
       if (ratingValue.label() instanceof SecurityLabel == false) {
         unknownRatings++;
         return;
@@ -460,6 +411,9 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
         case GOOD:
           goodRatings++;
           break;
+        case UNCLEAR:
+          unknownRatings++;
+          break;
         default:
           throw new IllegalArgumentException(
               String.format("Hey! I don't know this label: %s", label));
@@ -467,35 +421,45 @@ public class MarkdownReporter extends AbstractReporter<GitHubProject> {
     }
 
     /**
-     * Returns a percent of projects with a bad rating.
+     * Returns a percent of projects with bad rating.
+     *
+     * @return A percent of projects with bad rating.
      */
     double badRatingsPercent() {
       return (double) badRatings * 100 / total;
     }
 
     /**
-     * Returns a percent of projects with a moderate rating.
+     * Returns a percent of projects with moderate rating.
+     *
+     * @return A percent of projects with moderate rating.
      */
     double moderateRatingsPercent() {
       return (double) moderateRatings * 100 / total;
     }
 
     /**
-     * Returns a percent of projects with a good rating.
+     * Returns a percent of projects with good rating.
+     *
+     * @return A percent of projects with good rating.
      */
     double goodRatingsPercent() {
       return (double) goodRatings * 100 / total;
     }
 
     /**
-     * Returns a percent of projects with an unknown rating.
+     * Returns a percent of projects with unknown rating.
+     *
+     * @return A percent of projects with unknown rating.
      */
     double unknownRatingsPercent() {
       return (double) unknownRatings * 100 / total;
     }
 
     /**
-     * Returns a percent of projects with an unclear rating.
+     * Returns a percent of projects with unclear rating.
+     *
+     * @return A percent of projects with unclear rating.
      */
     double unclearRatingsPercent() {
       return (double) unclearRatings * 100 / total;

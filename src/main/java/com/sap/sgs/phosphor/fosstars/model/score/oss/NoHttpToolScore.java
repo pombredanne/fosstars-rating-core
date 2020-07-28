@@ -19,12 +19,11 @@ import java.io.InputStream;
  * <p>The score shows if an open-source project uses nohttp tool
  * to catch usage of insecure HTTP protocol.</p>
  *
- * <p>The score is based on the following features:
+ * <p>The score is based on the following features.</p>
  * <ul>
  *   <li>{@link com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures#USES_NOHTTP}</li>
  *   <li>{@link com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures#PACKAGE_MANAGERS}</li>
  * </ul>
- * </p>
  *
  * @see <a href="https://github.com/spring-io/nohttp">nohttp</a>
  */

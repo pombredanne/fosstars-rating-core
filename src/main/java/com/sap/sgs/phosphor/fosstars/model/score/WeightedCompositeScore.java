@@ -40,17 +40,35 @@ public class WeightedCompositeScore extends AbstractScore implements Tunable {
 
   /**
    * Makes a score from a list of sub-scores.
+   *
+   * @param name A name of the new score.
+   * @param subScores A number of sub-scores.
    */
   public WeightedCompositeScore(String name, Score... subScores) {
     this(name, setOf(subScores), ScoreWeights.createFor(subScores));
   }
 
   /**
+   * Makes a score from a set of sub-scores.
+   *
+   * @param name A name of the new score.
+   * @param subScores A number of sub-scores.
+   */
+  public WeightedCompositeScore(String name, Set<Score> subScores) {
+    this(name, subScores, ScoreWeights.createFor(subScores));
+  }
+
+  /**
    * Initializes a new score.
    * This constructor is used by Jackson during deserialization.
+   *
+   * @param name A name of the new score.
+   * @param subScores A set of sub-scores.
+   * @param weights Weights for the sub-scores.
+   * @throws IllegalArgumentException If the parameters are invalid.
    */
   @JsonCreator
-  WeightedCompositeScore(
+  public WeightedCompositeScore(
       @JsonProperty("name") String name,
       @JsonProperty("subScores") Set<Score> subScores,
       @JsonProperty("weights") ScoreWeights weights) {
@@ -76,7 +94,7 @@ public class WeightedCompositeScore extends AbstractScore implements Tunable {
       }
     }
 
-    this.subScores = subScores;
+    this.subScores = new HashSet<>(subScores);
     this.weights = weights;
   }
 
@@ -87,7 +105,9 @@ public class WeightedCompositeScore extends AbstractScore implements Tunable {
   }
 
   /**
-   * Returns weights of the sub-scores.
+   * Get weights of the sub-scores included in the score.
+   *
+   * @return Weights of the sub-scores.
    */
   @JsonGetter("weights")
   public ScoreWeights weights() {
@@ -122,21 +142,21 @@ public class WeightedCompositeScore extends AbstractScore implements Tunable {
 
     double weightSum = 0.0;
     double scoreSum = 0.0;
-    double confidenceSum = 0.0;
 
     ScoreValue scoreValue = new ScoreValue(this);
     boolean allNotApplicable = true;
     for (Score subScore : subScores) {
       ScoreValue subScoreValue = calculateIfNecessary(subScore, valueSet);
       scoreValue.usedValues(subScoreValue);
+      Weight weight = weights.of(subScore).orElseThrow(IllegalStateException::new);
+      subScoreValue.weight(weight.value());
+
       if (subScoreValue.isNotApplicable()) {
         continue;
       }
+
       allNotApplicable = false;
-      Weight weight = weights.of(subScore).orElseThrow(IllegalStateException::new);
-      subScoreValue.weight(weight.value());
       scoreSum += weight.value() * subScoreValue.get();
-      confidenceSum += weight.value() * subScoreValue.confidence();
       weightSum += weight.value();
     }
 
@@ -149,14 +169,13 @@ public class WeightedCompositeScore extends AbstractScore implements Tunable {
     }
 
     scoreValue.set(Score.adjust(scoreSum / weightSum));
-    scoreValue.confidence(Confidence.adjust(confidenceSum / weightSum));
+    scoreValue.confidence(Confidence.make(scoreValue.usedValues()));
 
     return scoreValue;
   }
 
   /**
-   * The score doesn't use any feature directory
-   * so that this method returns an empty set.
+   * The score doesn't use any feature directory so that this method returns an empty set.
    *
    * @return An empty set of features.
    */

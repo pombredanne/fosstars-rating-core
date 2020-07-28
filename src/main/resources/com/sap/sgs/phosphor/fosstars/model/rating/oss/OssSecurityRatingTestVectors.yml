@@ -56,6 +56,11 @@ defaults:
     type: "BooleanFeature"
     name: "If a project has a bug bounty program"
   flag: false
+- type: "BooleanValue"
+  feature:
+    type: "BooleanFeature"
+    name: "If a project signs artifacts"
+  flag: false
 
 # test vectors
 elements:
@@ -151,7 +156,7 @@ elements:
     positiveInfinity: false
   expectedLabel:
   - "OssSecurityRating$SecurityLabel"
-  - "BAD"
+  - "UNCLEAR"
   alias: "all_unknown"
 
 #
@@ -484,7 +489,7 @@ elements:
     feature:
       type: "BooleanFeature"
       name: "If an open-source project is regularly scanned for vulnerable dependencies"
-    flag: false
+    flag: true
   - type: "BooleanValue"
     feature:
       type: "BooleanFeature"
@@ -507,7 +512,7 @@ elements:
     from: 4.0
     openLeft: false
     negativeInfinity: false
-    to: 5.0
+    to: 6.0
     openRight: false
     positiveInfinity: false
   expectedLabel:

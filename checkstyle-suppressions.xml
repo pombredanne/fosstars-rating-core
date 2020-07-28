@@ -5,7 +5,7 @@
 <suppressions>
   <suppress checks="AbbreviationAsWordInName"
     files="OssSecurityScoreTuningWithCMAES.java"
-    lines="9"/>
+    lines="12"/>
   <suppress checks="AbbreviationAsWordInName"
     files="SecurityRatingExampleTuningWithCMAES.java"
     lines="13"/>
@@ -33,6 +33,9 @@
   <suppress checks="AbbreviationAsWordInName"
     files="BaseMetricV2.java"
     lines="52"/>
+  <suppress checks="AbbreviationAsWordInName"
+    files="BaseMetricV3.java"
+    lines="28"/>
   <suppress checks="AbbreviationAsWordInName"
     files="TestNVD.java"
     lines="9"/>

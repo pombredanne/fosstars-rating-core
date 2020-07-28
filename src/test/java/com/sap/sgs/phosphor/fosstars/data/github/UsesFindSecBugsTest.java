@@ -1,5 +1,6 @@
 package com.sap.sgs.phosphor.fosstars.data.github;
 
+import static com.sap.sgs.phosphor.fosstars.data.github.TestGitHubDataFetcherHolder.TestGitHubDataFetcher.addForTesting;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.USES_FIND_SEC_BUGS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +27,15 @@ public class UsesFindSecBugsTest extends TestGitHubDataFetcherHolder {
   }
 
   @Test
+  public void testMavenWithFindSecBugsInProfilesBuild() throws IOException {
+    try (InputStream is = getClass()
+        .getResourceAsStream("MavenWithFindSecBugsInProfilesBuild.xml")) {
+
+      checkValue(createProvider(is, "pom.xml"), true);
+    }
+  }
+
+  @Test
   public void testMavenWithoutFindSecBugs() throws IOException {
     try (InputStream is = getClass().getResourceAsStream("MavenWithoutFindSecBugs.xml")) {
       checkValue(createProvider(is, "pom.xml"), false);
@@ -37,7 +47,7 @@ public class UsesFindSecBugsTest extends TestGitHubDataFetcherHolder {
     when(repository.read(filename)).thenReturn(Optional.of(is));
 
     GitHubProject project = new GitHubProject("org", "test");
-    fetcher.addForTesting(project, repository);
+    addForTesting(project, repository);
 
     UsesFindSecBugs provider = new UsesFindSecBugs(fetcher);
     provider.set(new GitHubProjectValueCache());

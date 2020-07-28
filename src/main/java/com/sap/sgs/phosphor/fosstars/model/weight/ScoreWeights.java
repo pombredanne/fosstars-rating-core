@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A collection of weights for scores.
@@ -71,6 +72,17 @@ public class ScoreWeights implements Tunable {
   }
 
   /**
+   * Creates a collection of weights for a set of scores.
+   *
+   * @param scores The scores.
+   * @return The collection of weights.
+   */
+  public static ScoreWeights createFor(Set<Score> scores) {
+    Objects.requireNonNull(scores, "Scores can't be null!");
+    return createFor(scores.toArray(new Score[0]));
+  }
+
+  /**
    * Initializes a new collection of weights.
    *
    * @param values The weights.
@@ -82,21 +94,29 @@ public class ScoreWeights implements Tunable {
   }
 
   /**
-   * Returns a weight for a score if it exists.
+   * Creates a weight for a score.
+   *
+   * @param score The score.
+   * @return A weight for a score if it exists.
    */
   public Optional<Weight> of(Score score) {
     return of(score.getClass());
   }
 
   /**
-   * Returns a weight for a score type if it exists.
+   * Creates a weight for a score of specified type.
+   *
+   * @param clazz The type.
+   * @return A weight for a score type if it exists.
    */
   public Optional<Weight> of(Class<? extends Score> clazz) {
     return Optional.ofNullable(values.get(clazz));
   }
 
   /**
-   * Returns a number of weights.
+   * Get a number of weights.
+   *
+   * @return A number of weights.
    */
   public int size() {
     return values.size();

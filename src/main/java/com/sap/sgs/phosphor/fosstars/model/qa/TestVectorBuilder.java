@@ -42,10 +42,22 @@ public class TestVectorBuilder {
   private String alias;
 
   /**
-   * Creates a new test vector.
+   * Creates a new test vector builder.
+   *
+   * @return A new builder.
    */
   public static TestVectorBuilder newTestVector() {
     return new TestVectorBuilder();
+  }
+
+  /**
+   * Creates a new test vector builder.
+   *
+   * @param alias An alias for the test vector.
+   * @return A new builder.
+   */
+  public static TestVectorBuilder newTestVector(String alias) {
+    return newTestVector().alias(alias);
   }
 
   /**

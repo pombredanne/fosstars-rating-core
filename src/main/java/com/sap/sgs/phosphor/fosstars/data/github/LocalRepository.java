@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -63,7 +64,9 @@ public class LocalRepository implements AutoCloseable {
   }
 
   /**
-   * Returns info about the repository.
+   * Get info about the repository.
+   *
+   * @return Info about the repository.
    */
   public LocalRepositoryInfo info() {
     return info;
@@ -120,7 +123,10 @@ public class LocalRepository implements AutoCloseable {
   }
 
   /**
-   * Returns the first commit in the repository.
+   * Get the first commit in the repository.
+   *
+   * @return The first commit in the repository.
+   * @throws IOException If something went wrong.
    */
   @JsonIgnore
   public Optional<Commit> firstCommit() throws IOException {
@@ -131,6 +137,19 @@ public class LocalRepository implements AutoCloseable {
     }
 
     return Optional.of(commits.get(commits.size() - 1));
+  }
+
+  /**
+   * Resets the repository in a hard way by calling "git reset --hard".
+   *
+   * @throws IOException If something went wrong.
+   */
+  public void reset() throws IOException {
+    try (Git git = new Git(repository)) {
+      git.reset().setMode(ResetType.HARD).call();
+    } catch (GitAPIException e) {
+      throw new IOException("Could not reset the repository!", e);
+    }
   }
 
   /**
@@ -153,6 +172,7 @@ public class LocalRepository implements AutoCloseable {
    *
    * @param file The file name.
    * @return A content of the file.
+   * @throws IOException If something went wrong.
    */
   public Optional<String> file(String file) throws IOException {
     Objects.requireNonNull(file, "On no! File name is null!");
@@ -164,6 +184,7 @@ public class LocalRepository implements AutoCloseable {
    *
    * @param file The file name.
    * @return A content of the file.
+   * @throws IOException If something went wrong.
    */
   public Optional<String> file(Path file) throws IOException {
     Objects.requireNonNull(file, "On no! File name is null!");
@@ -180,6 +201,7 @@ public class LocalRepository implements AutoCloseable {
    *
    * @param file The file name.
    * @return A content of the file.
+   * @throws IOException If something went wrong.
    */
   public Optional<InputStream> read(String file) throws IOException {
     Objects.requireNonNull(file, "On no! File name is null!");
@@ -191,6 +213,7 @@ public class LocalRepository implements AutoCloseable {
    *
    * @param file The file name.
    * @return A content of the file.
+   * @throws IOException If something went wrong.
    */
   public Optional<InputStream> read(Path file) throws IOException {
     Objects.requireNonNull(file, "On no! File name is null!");

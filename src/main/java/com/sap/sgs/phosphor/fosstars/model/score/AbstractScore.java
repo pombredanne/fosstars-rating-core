@@ -66,9 +66,11 @@ public abstract class AbstractScore implements Score {
   public AbstractScore(String name, String description) {
     Objects.requireNonNull(name, "Hey! Score name can't be null!");
     Objects.requireNonNull(description, "Hey! Score description can't be null!");
+
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Hey! Score name can't be empty!");
     }
+
     this.name = name;
     this.description = description;
   }
@@ -131,7 +133,7 @@ public abstract class AbstractScore implements Score {
       return false;
     }
     AbstractScore that = (AbstractScore) o;
-    return Objects.equals(name, that.name) && Objects.equals(description, this.description);
+    return Objects.equals(name, that.name) && Objects.equals(description, that.description);
   }
 
   @Override
@@ -216,8 +218,11 @@ public abstract class AbstractScore implements Score {
   }
 
   /**
-   * The method calculates a value for a specified score if the value is not available.
+   * The method calculates a score value for a specified score if the value is not available.
    *
+   * @param score The score.
+   * @param values The values that should be used to calculate the score value.
+   * @return The calculated score value.
    * @see #calculateIfNecessary(Score, ValueSet)
    */
   protected static ScoreValue calculateIfNecessary(Score score, Value... values) {

@@ -14,6 +14,7 @@ import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.NUMBER
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.PACKAGE_MANAGERS;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.PROJECT_START_DATE;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.SCANS_FOR_VULNERABLE_DEPENDENCIES;
+import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.SIGNS_ARTIFACTS;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.SUPPORTED_BY_COMPANY;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.USES_ADDRESS_SANITIZER;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.USES_DEPENDABOT;
@@ -87,6 +88,7 @@ public class OssSecurityScoreTest {
         HAS_SECURITY_TEAM.value(false),
         HAS_SECURITY_POLICY.value(false),
         HAS_BUG_BOUNTY_PROGRAM.value(false),
+        SIGNS_ARTIFACTS.value(true),
         SCANS_FOR_VULNERABLE_DEPENDENCIES.value(false),
         VULNERABILITIES.value(new Vulnerabilities()),
         PROJECT_START_DATE.value(new Date()),
@@ -97,10 +99,10 @@ public class OssSecurityScoreTest {
         USES_DEPENDABOT.value(true),
         USES_GITHUB_FOR_DEVELOPMENT.value(true),
         LANGUAGES.value(Languages.of(JAVA)),
-        USES_ADDRESS_SANITIZER.unknown(),
-        USES_MEMORY_SANITIZER.unknown(),
-        USES_UNDEFINED_BEHAVIOR_SANITIZER.unknown(),
-        FUZZED_IN_OSS_FUZZ.unknown(),
+        USES_ADDRESS_SANITIZER.value(false),
+        USES_MEMORY_SANITIZER.value(false),
+        USES_UNDEFINED_BEHAVIOR_SANITIZER.value(false),
+        FUZZED_IN_OSS_FUZZ.value(false),
         USES_FIND_SEC_BUGS.value(true),
         PACKAGE_MANAGERS.value(PackageManagers.from(MAVEN)));
     ScoreValue scoreValue = score.calculate(values);

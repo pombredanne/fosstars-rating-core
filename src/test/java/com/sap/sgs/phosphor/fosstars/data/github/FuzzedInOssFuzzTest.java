@@ -1,6 +1,7 @@
 package com.sap.sgs.phosphor.fosstars.data.github;
 
 import static com.sap.sgs.phosphor.fosstars.data.github.FuzzedInOssFuzz.OSS_FUZZ_PROJECT;
+import static com.sap.sgs.phosphor.fosstars.data.github.TestGitHubDataFetcherHolder.TestGitHubDataFetcher.addForTesting;
 import static com.sap.sgs.phosphor.fosstars.model.feature.oss.OssFeatures.FUZZED_IN_OSS_FUZZ;
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -29,7 +29,7 @@ public class FuzzedInOssFuzzTest extends TestGitHubDataFetcherHolder {
 
       repository.create();
 
-      Path projectDirectory = Paths.get("projects").resolve("project");
+      Path projectDirectory = directory.resolve("projects").resolve("project");
       Files.createDirectories(projectDirectory);
 
       Path dockerFilePath = new File(repository.getDirectory().getParent(), "Dockerfile").toPath();
@@ -45,7 +45,7 @@ public class FuzzedInOssFuzzTest extends TestGitHubDataFetcherHolder {
           new LocalRepositoryInfo(directory, new Date(), OSS_FUZZ_PROJECT.url()),
           repository
       );
-      fetcher.addForTesting(OSS_FUZZ_PROJECT, localRepository);
+      addForTesting(OSS_FUZZ_PROJECT, localRepository);
 
       FuzzedInOssFuzz provider = new FuzzedInOssFuzz(fetcher);
       provider.set(new GitHubProjectValueCache());

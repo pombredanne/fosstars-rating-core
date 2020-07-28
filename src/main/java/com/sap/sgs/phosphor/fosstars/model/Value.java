@@ -11,6 +11,8 @@ import com.sap.sgs.phosphor.fosstars.model.value.IntegerValue;
 import com.sap.sgs.phosphor.fosstars.model.value.LanguagesValue;
 import com.sap.sgs.phosphor.fosstars.model.value.LgtmGradeValue;
 import com.sap.sgs.phosphor.fosstars.model.value.NotApplicableValue;
+import com.sap.sgs.phosphor.fosstars.model.value.OwaspDependencyCheckCvssThresholdValue;
+import com.sap.sgs.phosphor.fosstars.model.value.OwaspDependencyCheckUsageValue;
 import com.sap.sgs.phosphor.fosstars.model.value.PackageManagersValue;
 import com.sap.sgs.phosphor.fosstars.model.value.ScoreValue;
 import com.sap.sgs.phosphor.fosstars.model.value.UnknownValue;
@@ -35,27 +37,37 @@ import com.sap.sgs.phosphor.fosstars.model.value.VulnerabilitiesValue;
     @JsonSubTypes.Type(value = EnumValue.class),
     @JsonSubTypes.Type(value = LgtmGradeValue.class),
     @JsonSubTypes.Type(value = LanguagesValue.class),
-    @JsonSubTypes.Type(value = PackageManagersValue.class)
+    @JsonSubTypes.Type(value = PackageManagersValue.class),
+    @JsonSubTypes.Type(value = OwaspDependencyCheckUsageValue.class),
+    @JsonSubTypes.Type(value = OwaspDependencyCheckCvssThresholdValue.class)
 })
 public interface Value<T> {
 
   /**
-   * Returns a feature which the value is for.
+   * Get a feature which the value is for.
+   *
+   * @return A feature which the value is for.
    */
   Feature feature();
 
   /**
-   * Returns true if the value is unknown, false otherwise.
+   * Tells if the value is unknown.
+   *
+   * @return True if the value is unknown, false otherwise.
    */
   boolean isUnknown();
 
   /**
-   * Returns true if the value is not applicable in the current context, false otherwise.
+   * Tells if the value is N/A.
+   *
+   * @return True if the value is not applicable in the current context, false otherwise.
    */
   boolean isNotApplicable();
 
   /**
-   * Returns the value.
+   * Get the value.
+   *
+   * @return The value.
    */
   T get();
 

@@ -1,7 +1,9 @@
 package com.sap.sgs.phosphor.fosstars.data.github;
 
+import static com.sap.sgs.phosphor.fosstars.maven.MavenUtils.browse;
 import static com.sap.sgs.phosphor.fosstars.maven.MavenUtils.readModel;
 
+import com.sap.sgs.phosphor.fosstars.maven.ModelVisitor;
 import com.sap.sgs.phosphor.fosstars.model.Feature;
 import com.sap.sgs.phosphor.fosstars.model.Value;
 import com.sap.sgs.phosphor.fosstars.model.feature.BooleanFeature;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -62,28 +65,10 @@ public class UsesOwaspDependencyCheck extends CachedSingleFeatureGitHubDataProvi
       return false;
     }
 
-    Model model;
     try (InputStream is = content.get()) {
-      model = readModel(is);
+      Model model = readModel(is);
+      return browse(model, withVisitor()).result;
     }
-
-    if (model.getBuild() != null) {
-      for (Plugin plugin : model.getBuild().getPlugins()) {
-        if (isDependencyCheck(plugin)) {
-          return true;
-        }
-      }
-    }
-
-    if (model.getReporting() != null) {
-      for (ReportPlugin plugin : model.getReporting().getPlugins()) {
-        if (isDependencyCheck(plugin)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -131,5 +116,37 @@ public class UsesOwaspDependencyCheck extends CachedSingleFeatureGitHubDataProvi
   private static boolean isDependencyCheck(ReportPlugin plugin) {
     return "org.owasp".equals(plugin.getGroupId())
         && "dependency-check-maven".equals(plugin.getArtifactId());
+  }
+
+  /**
+   * Creates a new visitor for searching OWASP Dependency Check in a POM file.
+   */
+  private static Visitor withVisitor() {
+    return new Visitor();
+  }
+
+  /**
+   * A visitor for searching OWASP Dependency Check in a POM file.
+   */
+  private static class Visitor implements ModelVisitor {
+
+    /**
+     * This flag shows whether OWASP Dependency Check tool was found in a POM file or not.
+     */
+    private boolean result = false;
+
+    @Override
+    public void accept(Plugin plugin, Set<Location> locations) {
+      if (isDependencyCheck(plugin)) {
+        result = true;
+      }
+    }
+
+    @Override
+    public void accept(ReportPlugin plugin, Set<Location> locations) {
+      if (isDependencyCheck(plugin)) {
+        result = true;
+      }
+    }
   }
 }
